@@ -102,8 +102,19 @@ h2 {
 }
 #tooltip p {
     margin: 0;
-    font-family: sans-serif;
+    font-family: Poppins;
     font-size: 16px;
     line-height: 20px;
+    color: black;
 }
-```
+
+.container h1 {
+  font-family: Balsamiq Sans;
+  text-align: center;
+  margin-top: 20px;
+  padding: 5px;
+}
+
+select {
+  font-family: 'Gill Sans';
+}

@@ -10,7 +10,6 @@ fetch('attractions.json')
   .then(data => {
 		attractions = data;
 		
-	
 	// takes a list of json objects in one category, sorts them by visitor number and returns the top 5 most visited
 	  function filterData(category) {
 		  console.log(category)
@@ -20,33 +19,32 @@ fetch('attractions.json')
 		  })
 		  console.log("In filter data, the category is ", category.slice(0,5))
 		  return category.slice(0,5);
-	  }
+	  } // end filterData
 
-	//   renderBarChart(filterData(something))
-	console.log(attractions);
+
 	  renderBarChart(filterData(attractions));
 	  
 	  let menu = document.querySelector("#attraction-category")
-
+	  // listen for when the dropdown is changes
 	  menu.addEventListener("change", function (event) {
 		  let category = event.target.value;
-		  console.log(category);
-		  //console.log(attractions)
+		  //console.log(category);
+		  
 
 		  let subset = attractions.filter(function(a){
-			  //console.log(a)
-			 // console.log(a.Category)
-			  // want only the items that have the property Category = category
-			  //console.log("the category we WANT is: ", category)
-			  return a.Category == category;
+			  //console.log("The category is ", category)
+			  if (category == "all") {
+				return attractions;
+			  } else {
+				  return a.Category == category;
+			  }
+			  
 		  })
-		  console.log("The new data is: ", subset)
+		  //console.log("The new data is: ", subset)
 		  let filtered = filterData(subset);
-
 		  renderBarChart(filtered);
-	  });
+	  });// end event listener
 
-	
 	});
 
 

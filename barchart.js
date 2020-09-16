@@ -52,6 +52,7 @@ function renderBarChart(data) {
   }
 
   // Check object properties
+  console.log("DATA0 :", data[0])
   if (
     !data[0].hasOwnProperty("Visitors") ||
     !data[0].hasOwnProperty("Location") ||
@@ -109,12 +110,12 @@ function renderBarChart(data) {
         margin.left +
         width / 2 +
         parseFloat(d3.select(this).attr("x")) +
-        x.bandwidth() / 2 - 375;
+        x.bandwidth() / 2 - 200;
       let yPosition =
         margin.top + parseFloat(d3.select(this).attr("y")) / 2 + height;
-      console.log("x: ", xPosition);
-      console.log("y: ", yPosition);
-      console.log("D: ", xPosition);
+      // console.log("x: ", xPosition);
+      // console.log("y: ", yPosition);
+      // console.log("D: ", xPosition);
       d3.select(this)
         .style("stroke", "black")
         .style("fill", "rgb(50, 100, 170)");
