@@ -1,161 +1,180 @@
 
+/*****************************************/
+/*   DRAW BAR CHART - ALREADY COMPLETE   */
+/*****************************************/
 
-// ```jsx
-// /*****************************************/
-// /*   DRAW BAR CHART - ALREADY COMPLETE   */
-// /*****************************************/
+// CHART AREA
 
-// // CHART AREA
+let margin = { top: 40, right: 20, bottom: 40, left: 90 },
+  width =
+    document.querySelector("#chart-area").clientWidth -
+    margin.left -
+    margin.right,
+  height = 400 - margin.top - margin.bottom;
 
-// let margin = { top: 40, right: 20, bottom: 40, left: 90 },
-//   width =
-//     document.querySelector("#chart-area").clientWidth -
-//     margin.left -
-//     margin.right,
-//   height = 400 - margin.top - margin.bottom;
+width = width > 600 ? 600 : width;
 
-// width = width > 600 ? 600 : width;
+let svg = d3
+  .select("#chart-area")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// let svg = d3
-//   .select("#chart-area")
-//   .append("svg")
-//   .attr("width", width + margin.left + margin.right)
-//   .attr("height", height + margin.top + margin.bottom)
-//   .append("g")
-//   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// AXIS
 
-// // AXIS
+let x = d3
+  .scaleBand()
+  .range([0, width])
+  .paddingInner(0.1);
 
-// let x = d3
-//   .scaleBand()
-//   .range([0, width])
-//   .paddingInner(0.1);
+let y = d3.scaleLinear().range([height, 0]);
 
-// let y = d3.scaleLinear().range([height, 0]);
+let xAxis = d3
+  .axisBottom()
+  .scale(x)
+  .tickFormat(function(d) {
+    return shortenString(d, 20);
+  });
 
-// let xAxis = d3
-//   .axisBottom()
-//   .scale(x)
-//   .tickFormat(function(d) {
-//     return shortenString(d, 20);
-//   });
+let yAxis = d3.axisLeft().scale(y);
 
-// let yAxis = d3.axisLeft().scale(y);
+let xAxisGroup = svg.append("g").attr("class", "x-axis axis");
 
-// let xAxisGroup = svg.append("g").attr("class", "x-axis axis");
+let yAxisGroup = svg.append("g").attr("class", "y-axis axis");
 
-// let yAxisGroup = svg.append("g").attr("class", "y-axis axis");
+function renderBarChart(data) {
+  // Check array length (top 5 attractions)
+  if (data.length > 5) {
+    errorMessage("Max 5 rows");
+    return;
+  }
 
-// function renderBarChart(data) {
-//   // Check array length (top 5 attractions)
-//   if (data.length > 5) {
-//     errorMessage("Max 5 rows");
-//     return;
-//   }
+  // Check object properties
+  if (
+    !data[0].hasOwnProperty("Visitors") ||
+    !data[0].hasOwnProperty("Location") ||
+    !data[0].hasOwnProperty("Category")
+  ) {
+    errorMessage(
+      "The Object properties are not correct! An attraction should include at least: 'Visitors', 'Location', 'Category'"
+    );
+    return;
+  }
 
-//   // Check object properties
-//   if (
-//     !data[0].hasOwnProperty("Visitors") ||
-//     !data[0].hasOwnProperty("Location") ||
-//     !data[0].hasOwnProperty("Category")
-//   ) {
-//     errorMessage(
-//       "The Object properties are not correct! An attraction should include at least: 'Visitors', 'Location', 'Category'"
-//     );
-//     return;
-//   }
+  x.domain(
+    data.map(function(d) {
+      return d.Location;
+    })
+  );
+  y.domain([
+    0,
+    d3.max(data, function(d) {
+      return d.Visitors;
+    })
+  ]);
 
-//   x.domain(
-//     data.map(function(d) {
-//       return d.Location;
-//     })
-//   );
-//   y.domain([
-//     0,
-//     d3.max(data, function(d) {
-//       return d.Visitors;
-//     })
-//   ]);
+  // ---- DRAW BARS ----
+  let bars = svg
+    .selectAll(".bar")
+    .remove()
+    .exit()
+    .data(data);
+  
+ 
 
-//   // ---- DRAW BARS ----
-//   let bars = svg
-//     .selectAll(".bar")
-//     .remove()
-//     .exit()
-//     .data(data);
+  bars
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .transition()
+    .duration(1500)
+    .style("fill", "#6495ED")
+    .attr("x", function(d) {
+      return x(d.Location);
+    })
+    .attr("y", function(d) {
+      return y(d.Visitors);
+    })
+    .attr("height", function(d) {
+      return height - y(d.Visitors);
+    })
+    .attr("width", x.bandwidth())
+  
+  let new_bars = svg.selectAll("rect")
+    .on("mouseover", function(event, d) {
+      //Get this bar's x/y values, then augment for the tooltip
+      let xPosition =
+        margin.left +
+        width / 2 +
+        parseFloat(d3.select(this).attr("x")) +
+        x.bandwidth() / 2 - 375;
+      let yPosition =
+        margin.top + parseFloat(d3.select(this).attr("y")) / 2 + height;
+      console.log("x: ", xPosition);
+      console.log("y: ", yPosition);
+      console.log("D: ", xPosition);
+      d3.select(this)
+        .style("stroke", "black")
+        .style("fill", "rgb(50, 100, 170)");
 
-//   bars
-//     .enter()
-//     .append("rect")
-//     .attr("class", "bar")
-//     .attr("x", function(d) {
-//       return x(d.Location);
-//     })
-//     .attr("y", function(d) {
-//       return y(d.Visitors);
-//     })
-//     .attr("height", function(d) {
-//       return height - y(d.Visitors);
-//     })
-//     .attr("width", x.bandwidth())
-//     .on("mouseover", function(d) {
-//       //Get this bar's x/y values, then augment for the tooltip
-//       let xPosition =
-//         margin.left +
-//         width / 2 +
-//         parseFloat(d3.select(this).attr("x")) +
-//         x.bandwidth() / 2;
-//       let yPosition =
-//         margin.top + parseFloat(d3.select(this).attr("y")) / 2 + height;
+      //Update the tooltip position and value
+      d3.select("#tooltip")
+        .style("left", xPosition + "px")
+        .style("top", yPosition + "px")
+        .select("#value")
+        .text(d.Visitors);
 
-//       //Update the tooltip position and value
-//       d3.select("#tooltip")
-//         .style("left", xPosition + "px")
-//         .style("top", yPosition + "px")
-//         .select("#value")
-//         .text(d.Visitors);
+      //Show the tooltip
+      d3.select("#tooltip").classed("hidden", false);
 
-//       //Show the tooltip
-//       d3.select("#tooltip").classed("hidden", false);
-//     })
-//     .on("mouseout", function(d) {
-//       //Hide the tooltip
-//       d3.select("#tooltip").classed("hidden", true);
-//     });
+      
+    })
+    .on("mouseout", function(d) {
+      //Hide the tooltip
+      d3.select("#tooltip").classed("hidden", true);
 
-//   // ---- DRAW AXIS	----
-//   xAxisGroup = svg
-//     .select(".x-axis")
-//     .attr("transform", "translate(0," + height + ")")
-//     .call(xAxis);
+      d3.select(this)
+        .style("stroke", "none")
+        .style("fill", "#6495ED");
+    });
 
-//   yAxisGroup = svg.select(".y-axis").call(yAxis);
 
-//   svg.select("text.axis-title").remove();
-//   svg
-//     .append("text")
-//     .attr("class", "axis-title")
-//     .attr("x", -5)
-//     .attr("y", -15)
-//     .attr("dy", ".1em")
-//     .style("text-anchor", "end")
-//     .text("Annual Visitors");
-// }
+  // ---- DRAW AXIS	----
+  xAxisGroup = svg
+    .select(".x-axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
 
-// function errorMessage(message) {
-//   console.log(message);
-// }
+  yAxisGroup = svg.select(".y-axis").call(yAxis);
 
-// function shortenString(content, maxLength) {
-//   // Trim the string to the maximum length
-//   let trimmedString = content.substr(0, maxLength);
+  svg.select("text.axis-title").remove();
+  svg
+    .append("text")
+    .attr("class", "axis-title")
+    .attr("x", -5)
+    .attr("y", -15)
+    .attr("dy", ".1em")
+    .style("text-anchor", "end")
+    .text("Annual Visitors");
+  
 
-//   // Re-trim if we are in the middle of a word
-//   trimmedString = trimmedString.substr(
-//     0,
-//     Math.min(trimmedString.length, trimmedString.lastIndexOf(" "))
-//   );
+}
 
-//   return trimmedString;
-// }
-// ```
+function errorMessage(message) {
+  console.log(message);
+}
+
+function shortenString(content, maxLength) {
+  // Trim the string to the maximum length
+  let trimmedString = content.substr(0, maxLength);
+
+  // Re-trim if we are in the middle of a word
+  trimmedString = trimmedString.substr(
+    0,
+    Math.min(trimmedString.length, trimmedString.lastIndexOf(" "))
+  );
+
+  return trimmedString;
+}
